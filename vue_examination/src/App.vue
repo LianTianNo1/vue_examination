@@ -61,7 +61,7 @@
             <input type="radio" :name="item[list_data.title_index]" value="D" />
             <p class="choose_text">{{ item[list_data.D_index] }}</p>
           </div>
-          <div v-if="actualResult" class="actual_result">
+          <div class="actual_result">
             正确答案：{{ item[list_data.result_index] }}
           </div>
           <input
@@ -99,8 +99,7 @@ export default {
       answerList: [],
       // 错题页面显示
       errPageShow: false,
-      // 正确答案Div
-      actualResult: false,
+
       // 答题内容显示
       containerShow: true
     }
@@ -127,16 +126,18 @@ export default {
         }
       }
 
-      this.$axios.post('/readFile', formData, config).then(res => {
+      this.$axios.post('/demo/examination/readFile', formData, config).then(res => {
         if (res.data.code === 1 && res.data.error === null) {
-          // console.log(res)
+          console.log(res)
           this.list_data = res.data.data
           this.list_data.data.shift()
           this.chooseFileShow = false
           this.nextShow = true
+          this.mytip.createTip(res.data.msg, '#00BCD4', '#E0F7FA')
           // console.log(this.list_data)
         } else {
           console.log(res)
+          this.mytip.createTip(res.data.msg, '#FFAB91', '#F48FB1')
         }
       })
     },
@@ -177,14 +178,14 @@ export default {
       this.submitShow = false
       this.containerShow = false
       this.errPageShow = true
-      this.actualResult = true
       const errorList = []
       const successList = []
       const totalList = [...document.querySelectorAll('.item')]
       const errorDivDom = document.querySelector('.error_list')
-      console.log(errorDivDom)
+      // console.log(errorDivDom)
       totalList.forEach(item => {
         item.className = 'item flag'
+        item.children[5].style.display = 'block'
         if (item.isSuccess) {
           successList.push(item)
         } else {
@@ -194,7 +195,7 @@ export default {
         }
       })
 
-      console.log(successList, errorList)
+      // console.log(successList, errorList)
     }
   },
 }
@@ -399,40 +400,6 @@ input[type='checkbox'] {
   height: 100vh;
 }
 .actual_result {
-  /* display: none; */
-}
-/* 消息组件 */
-.mytip {
-  position: fixed;
-  left: 50%;
-  top: 40%;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  border: 1px solid #0080ff;
-  color: white;
-  background-color: #1ec0ff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: mytip_an 3s cubic-bezier(0.42, 0, 0.89, 0.07) forwards;
-}
-@keyframes mytip_an {
-  30%,
-  70% {
-    transform: translate(-40%, -50%);
-  }
-  50%,
-  90% {
-    transform: translate(-60%, -50%);
-  }
-  95% {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    top: -20%;
-  }
+  display: none;
 }
 </style>
