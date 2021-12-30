@@ -75,25 +75,6 @@
             </div>
           </div>
         </div>
-        <div
-          v-show="JSON.stringify(blank_list_data) !== '{}'"
-          class="sign_choose"
-        >
-          <div class="left_title">填空题</div>
-          <div class="left_item">
-            <div
-              @click="chooseItem('blank', index)"
-              :key="item[blank_list_data['title_index']]"
-              v-for="(item, index) in blank_list_data.data"
-              :class="{
-                serial: true,
-                serial_visited: blank_answerList[index],
-              }"
-            >
-              {{ index + 1 }}
-            </div>
-          </div>
-        </div>
         <div @click="showResult" class="submit">提交</div>
       </div>
       <div class="right">
@@ -211,42 +192,6 @@
             </div>
           </div>
         </div>
-        <div class="blank_exercises_box">
-          <div
-            v-show="index === blank_item_index"
-            :key="item[blank_list_data['title_index']]"
-            v-for="(item, index) in blank_list_data.data"
-            class="exercises_item"
-          >
-            <div class="etile">
-              {{ index + 1 }}: {{ item[blank_list_data['title_index']] }}
-            </div>
-            <div class="echoose">
-              <input
-                :key="item2 + index2"
-                v-for="(item2, index2) in item[
-                  blank_list_data['result_index']
-                ].split('，')"
-                type="text"
-                :placeholder="`第${index2 + 1}空`"
-                class="input_blank"
-                @keyup="
-                  saveBlank(
-                    item[blank_list_data['result_index']],
-                    index,
-                    index2,
-                    'blank',
-                    $event
-                  )
-                "
-              />
-            </div>
-            <div class="hide_item">
-              正确答案:
-              {{ item[blank_list_data['result_index']] }}
-            </div>
-          </div>
-        </div>
         <div @click="nextItem" class="next_item">下一题</div>
         <div @click="preItem" class="next_item">上一题</div>
       </div>
@@ -265,16 +210,12 @@ export default {
       mult_list_data: {},
       // 判断
       judge_list_data: {},
-      // 填空
-      blank_list_data: {},
       // 当前单选显示的项的索引
       sign_item_index: 0,
       // 当前多选显示的项的索引
       mult_item_index: -1,
       // 当前判断题显示的项的索引
       judge_item_index: -1,
-      // 当前填空题显示的项的索引
-      blank_item_index: -1,
       // 选择文件的按钮是否出现
       chooseFileShow: true,
       // 下一题
@@ -287,8 +228,6 @@ export default {
       mult_answerList: [],
       // 储存用户判断题的答案
       judge_answerList: [],
-      // 储存用填空题的答案
-      blank_answerList: [],
       // 错题页面显示
       errPageShow: false,
 
@@ -313,23 +252,15 @@ export default {
       if (area === 'sign') {
         this.judge_item_index = -1
         this.mult_item_index = -1
-        this.blank_item_index = -1
         this.sign_item_index = index
       } else if (area === 'mult') {
         this.judge_item_index = -1
         this.sign_item_index = -1
-        this.blank_item_index = -1
         this.mult_item_index = index
       } else if (area === 'judge') {
         this.sign_item_index = -1
         this.mult_item_index = -1
-        this.blank_item_index = -1
         this.judge_item_index = index
-      } else if (area === 'blank') {
-        this.sign_item_index = -1
-        this.judge_item_index = -1
-        this.mult_item_index = -1
-        this.blank_item_index = index
       }
     },
     // 选择文件
@@ -347,8 +278,9 @@ export default {
           'Content-Type': 'multipart/form-data'
         }
       }
-      // this.$axios.post('http://127.0.0.1:3000/demo/examination/readFile', formData, config).then(res => {
-      this.$axios.post('/demo/examination/readFile', formData, config).then(res => {
+      // this.$axios.post('http://120.25.249.159:3000/demo/examination/readFile', formData, config).then(res => {
+      this.$axios.post('http://127.0.0.1:3000/demo/examination/readFile', formData, config).then(res => {
+        // this.$axios.post('/demo/examination/readFile', formData, config).then(res => {
         if (res.data.code === 1 && res.data.error === null) {
           console.log(res)
           this.sign_list_data = res.data.data.sign_data
@@ -360,11 +292,9 @@ export default {
           this.judge_list_data = res.data.data.judge_data
           this.judge_list_data.data.shift()
           this.judge_list_data.data.sort(() => 0.5 - Math.random())
-          this.blank_list_data = res.data.data.blank_data
-          this.blank_list_data.data.shift()
-          this.blank_list_data.data.sort(() => 0.5 - Math.random())
           this.chooseFileShow = false
           this.mytip.createTip(res.data.msg, '#00BCD4', '#E0F7FA')
+          // console.log(this.sign_list_data)
         } else {
           console.log(res)
           this.mytip.createTip(res.data.msg, '#FFAB91', '#F48FB1')
@@ -388,11 +318,6 @@ export default {
           return false
         }
         this.judge_item_index--
-      } else if (this.nowArea === 'blank') {
-        if (this.blank_item_index <= 0) {
-          return false
-        }
-        this.blank_item_index--
       }
     },
     // 下一题
@@ -412,30 +337,7 @@ export default {
           return false
         }
         this.judge_item_index++
-      } else if (this.nowArea === 'blank') {
-        if (this.blank_item_index >= this.blank_list_data.data.length - 1) {
-          return false
-        }
-        this.blank_item_index++
       }
-    },
-    // 保存填空题答案
-    saveBlank(result, index, index2, area, e) {
-      this.nowArea = area
-      let blankArr = []
-      const chilrens = [...e.target.parentNode.children]
-      chilrens.forEach(item => {
-        blankArr.push(item.value)
-      })
-      let resultArr = result.split('，')
-      if (blankArr.length === resultArr.length && blankArr.toString() === resultArr.toString()) {
-        e.target.parentNode.parentNode.isSuccess = true
-        e.target.parentNode.parentNode.setAttribute('isSuccess', true)
-      } else {
-        e.target.parentNode.parentNode.isSuccess = false
-        e.target.parentNode.parentNode.setAttribute('isSuccess', false)
-      }
-      this.blank_answerList[index] = blankArr
     },
     // 保存答案
     savaAnswer(area, index, choose, e) {
@@ -708,15 +610,7 @@ body {
   justify-content: center;
   align-items: center;
 }
-.input_blank {
-  padding: 1rem;
-  margin: 1rem 3rem;
-  box-shadow: 4px 5px 8px 0px #0000001a;
-  letter-spacing: 2px;
-  outline: none;
-  border: none;
-  border-bottom: 1px solid #00bbff;
-}
+
 .echoose > div:nth-child(2)::before {
   content: 'B';
   background-color: #1ec0ff;
