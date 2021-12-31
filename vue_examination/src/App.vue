@@ -347,8 +347,8 @@ export default {
           'Content-Type': 'multipart/form-data'
         }
       }
-      // this.$axios.post('http://127.0.0.1:3000/demo/examination/readFile', formData, config).then(res => {
       this.$axios.post('/demo/examination/readFile', formData, config).then(res => {
+        // this.$axios.post('http://127.0.0.1:3000/demo/examination/readFile', formData, config).then(res => {
         if (res.data.code === 1 && res.data.error === null) {
           console.log(res)
           this.sign_list_data = res.data.data.sign_data
