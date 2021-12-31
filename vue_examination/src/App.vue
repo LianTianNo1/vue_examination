@@ -579,7 +579,7 @@ body {
 }
 .headinfo,
 .head_nav {
-  margin-bottom: 1rem;
+  margin-bottom: 2vh;
   background-color: #f5f7fa;
   box-shadow: 0px 1px 7px #00000033;
 }
@@ -595,9 +595,10 @@ body {
 .head_title {
   color: #336699;
   width: 100%;
+  height: 10vh;
   font-weight: bold;
   font-size: 2rem;
-  padding: 1rem;
+  /* padding: 1rem; */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -611,8 +612,8 @@ body {
 }
 
 .left {
-  height: 100%;
-  width: 20%;
+  height: 88vh;
+  width: 23%;
   padding: 1rem;
   background-color: #f5f7fa;
   box-shadow: 1px 1px 7px #00000033;
@@ -653,7 +654,7 @@ body {
 }
 .right {
   height: 100%;
-  width: 78%;
+  width: 75%;
   background: #f5f7fa;
   box-shadow: -1px -1px 7px #00000033;
   padding: 2rem;
